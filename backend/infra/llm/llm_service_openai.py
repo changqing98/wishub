@@ -1,7 +1,15 @@
 import os
+from typing import Dict, List, Union, Generator
+from dotenv import load_dotenv
+from openai import OpenAI
+
+from backend.domain.domainsvc import llm_service
+
+# 加载 .env 文件中的环境变量
+load_dotenv()
 
 
-class HelloAgentsLLM:
+class OenAILLMService(llm_service.LLMService):
     """
     为本书 "Hello Agents" 定制的LLM客户端。
     它用于调用任何兼容OpenAI接口的服务，并默认使用流式响应。
@@ -21,31 +29,29 @@ class HelloAgentsLLM:
 
         self.client = OpenAI(api_key=apiKey, base_url=baseUrl, timeout=timeout)
 
-    def think(self, messages: List[Dict[str, str]], temperature: float = 0) -> str:
-        """
-        调用大语言模型进行思考，并返回其响应。
-        """
-        print(f"🧠 正在调用 {self.model} 模型...")
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                temperature=temperature,
-                stream=True,
-            )
+    def complete(self, messages: List[Dict[str, str]], temperature: float = 0, stream: bool = False,
+                 max_tokens: int = 2048) -> Union[str, Generator[str, None, None]]:
+        res = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            stream=stream
+        )
 
-            # 处理流式响应
-            print("✅ 大语言模型响应成功:")
-            collected_content = []
-            for chunk in response:
-                if not chunk.choices:
-                    continue
-                content = chunk.choices[0].delta.content or ""
-                print(content, end="", flush=True)
-                collected_content.append(content)
-            print()  # 在流式输出结束后换行
-            return "".join(collected_content)
+        # 非流式：返回完整文本
+        if not stream:
+            return res.choices[0].message.content.strip()
 
-        except Exception as e:
-            print(f"❌ 调用LLM API时发生错误: {e}")
-            return None
+        # 流式：包装成逐块文本生成器
+        def stream_generator():
+            for chunk in res:
+                content = chunk.choices[0].delta.content
+                if content:
+                    yield content
+
+        return stream_generator()
+
+    def embedding(self, text: str) -> List[float]:
+        resp = self.client.embeddings.create(input=text, model=self.model)
+        return resp.data[0].embedding
