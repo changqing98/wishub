@@ -53,5 +53,5 @@ class OenAILLMService(llm_service.LLMService):
         return stream_generator()
 
     def embedding(self, text: str) -> List[float]:
-        resp = self.client.embeddings.create(input=text, model=self.model)
+        resp = self.client.embeddings.create(input=text, model="BAAI/bge-m3")
         return resp.data[0].embedding
