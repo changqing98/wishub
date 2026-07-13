@@ -4,10 +4,11 @@ from typing import Dict, List, Union, Generator
 
 class LLMService(abc.ABC):
     @abc.abstractmethod
-    def complete(self, messages: List[Dict[str, str]], temperature: float = 0, stream: bool = False,
+    def complete(self, model: str,  messages: List[Dict[str, str]], temperature: float = 0, stream: bool = False,
                  max_tokens: int = 2048) -> Union[str, Generator[str, None, None]]:
         """
         统一对话接口
+        :param model: llm model id
         :param messages: 对话历史
         :param temperature: 随机度
         :param max_tokens: 最大输出长度
