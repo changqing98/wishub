@@ -1,7 +1,10 @@
 import os
 from typing import Dict, List, Union, Generator
+
 from dotenv import load_dotenv
 from openai import OpenAI
+from zai import ZhipuAiClient
+from sentence_transformers import SentenceTransformer
 
 from backend.domain.domainsvc import llm_service
 
@@ -9,7 +12,7 @@ from backend.domain.domainsvc import llm_service
 load_dotenv()
 
 
-class OenAILLMService(llm_service.LLMService):
+class GeneralLLMService(llm_service.LLMService):
     """
     为本书 "Hello Agents" 定制的LLM客户端。
     它用于调用任何兼容OpenAI接口的服务，并默认使用流式响应。
@@ -23,15 +26,17 @@ class OenAILLMService(llm_service.LLMService):
         apiKey = apiKey or os.getenv("LLM_API_KEY")
         baseUrl = baseUrl or os.getenv("LLM_BASE_URL")
         timeout = timeout or int(os.getenv("LLM_TIMEOUT", 60))
+        zhipu_api_key = os.environ['GLM_API_KEY']
 
         if not all([self.model, apiKey, baseUrl]):
             raise ValueError("模型ID、API密钥和服务地址必须被提供或在.env文件中定义。")
 
-        self.client = OpenAI(api_key=apiKey, base_url=baseUrl, timeout=timeout)
+        self.openai_client = OpenAI(api_key=apiKey, base_url=baseUrl, timeout=timeout)
+        self.zhipuai_client = ZhipuAiClient(api_key=zhipu_api_key)
 
     def complete(self, messages: List[Dict[str, str]], temperature: float = 0, stream: bool = False,
                  max_tokens: int = 2048) -> Union[str, Generator[str, None, None]]:
-        res = self.client.chat.completions.create(
+        res = self.openai_client.chat.completions.create(
             model=self.model,
             messages=messages,
             temperature=temperature,
@@ -53,5 +58,7 @@ class OenAILLMService(llm_service.LLMService):
         return stream_generator()
 
     def embedding(self, text: str) -> List[float]:
-        resp = self.client.embeddings.create(input=text, model="BAAI/bge-m3")
-        return resp.data[0].embedding
+        # resp = self.zhipuai_client.embeddings.create(input=text, model="embedding-3")
+        # return resp.data[0].embedding
+        model = SentenceTransformer("BAAI/bge-large-zh-v1.5")
+        return model.encode(text)
