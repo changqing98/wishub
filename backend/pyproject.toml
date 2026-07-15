@@ -4,4 +4,12 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = []
+dependencies = [
+    "langchain-community>=0.3.31",
+    "langchian>=0.2.5",
+    "load-dotenv>=0.1.0",
+    "markdown>=3.9",
+    "openai>=2.45.0",
+    "unstructured>=0.18.3",
+    "zhipuai>=2.1.5.20250825",
+]
