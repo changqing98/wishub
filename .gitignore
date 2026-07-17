@@ -1,2 +1,5 @@
 .idea
 .venv
+database/wishub.sqlite3
+database/uploads/
+database/chroma_db/

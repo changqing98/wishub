@@ -1,64 +1,57 @@
-import os
-from typing import Dict, List, Union, Generator
+from __future__ import annotations
 
-from dotenv import load_dotenv
-from openai import OpenAI
-from zai import ZhipuAiClient
-from sentence_transformers import SentenceTransformer
+from typing import Dict, Generator, List, Optional, Union
 
-from backend.domain.domainsvc import llm_service
-
-# 加载 .env 文件中的环境变量
-load_dotenv()
+from backend.domain.domainsvc.llm_service import LLMService
 
 
-class GeneralLLMService(llm_service.LLMService):
-    """
-    为本书 "Hello Agents" 定制的LLM客户端。
-    它用于调用任何兼容OpenAI接口的服务，并默认使用流式响应。
-    """
+class OpenAICompatibleLLMService(LLMService):
+    """OpenAI-compatible chat completion service."""
 
-    def __init__(self, model: str = None, apiKey: str = None, baseUrl: str = None, timeout: int = None):
-        """
-        初始化客户端。优先使用传入参数，如果未提供，则从环境变量加载。
-        """
-        self.model = model or os.getenv("LLM_MODEL_ID")
-        apiKey = apiKey or os.getenv("LLM_API_KEY")
-        baseUrl = baseUrl or os.getenv("LLM_BASE_URL")
-        timeout = timeout or int(os.getenv("LLM_TIMEOUT", 60))
-        zhipu_api_key = os.environ['GLM_API_KEY']
+    def __init__(
+        self,
+        *,
+        model: str,
+        api_key: str,
+        base_url: Optional[str] = None,
+        timeout: int = 60,
+    ) -> None:
+        if not model or not api_key:
+            raise ValueError("LLM_MODEL_ID 和 LLM_API_KEY 必须配置")
 
-        if not all([self.model, apiKey, baseUrl]):
-            raise ValueError("模型ID、API密钥和服务地址必须被提供或在.env文件中定义。")
+        try:
+            from openai import OpenAI
+        except ModuleNotFoundError as exc:
+            raise RuntimeError("缺少 openai 依赖，无法启用真实 LLM 服务") from exc
 
-        self.openai_client = OpenAI(api_key=apiKey, base_url=baseUrl, timeout=timeout)
-        self.zhipuai_client = ZhipuAiClient(api_key=zhipu_api_key)
+        self._model = model
+        self._client = OpenAI(api_key=api_key, base_url=base_url or None, timeout=timeout)
 
-    def complete(self, messages: List[Dict[str, str]], temperature: float = 0, stream: bool = False,
-                 max_tokens: int = 2048) -> Union[str, Generator[str, None, None]]:
-        res = self.openai_client.chat.completions.create(
-            model=self.model,
+    def complete(
+        self,
+        messages: List[Dict[str, str]],
+        temperature: float = 0,
+        stream: bool = False,
+        max_tokens: int = 2048,
+    ) -> Union[str, Generator[str, None, None]]:
+        response = self._client.chat.completions.create(
+            model=self._model,
             messages=messages,
             temperature=temperature,
             max_tokens=max_tokens,
-            stream=stream
+            stream=stream,
         )
 
-        # 非流式：返回完整文本
         if not stream:
-            return res.choices[0].message.content.strip()
+            return (response.choices[0].message.content or "").strip()
 
-        # 流式：包装成逐块文本生成器
-        def stream_generator():
-            for chunk in res:
+        def stream_generator() -> Generator[str, None, None]:
+            for chunk in response:
                 content = chunk.choices[0].delta.content
                 if content:
                     yield content
 
         return stream_generator()
 
-    def embedding(self, text: str) -> List[float]:
-        # resp = self.zhipuai_client.embeddings.create(input=text, model="embedding-3")
-        # return resp.data[0].embedding
-        model = SentenceTransformer("BAAI/bge-large-zh-v1.5")
-        return model.encode(text)
+
+GeneralLLMService = OpenAICompatibleLLMService
