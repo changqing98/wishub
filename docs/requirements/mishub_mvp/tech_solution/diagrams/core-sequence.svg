@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1120" viewBox="0 0 1440 1120" role="img" aria-labelledby="title desc">
+  <title id="title">wishub MVP 核心功能链路时序图</title>
+  <desc id="desc">展示 Markdown 上传入库和知识问答的核心时序，包含前端、接口层、应用层、仓储、向量库和 LLM。</desc>
+  <defs>
+    <style>
+      .bg { fill: #F7F8FA; }
+      .panel { fill: #FFFFFF; stroke: #E5E9F0; stroke-width: 1; }
+      .kicker { fill: #2F6BFF; font-family: Arial, "PingFang SC", sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0; }
+      .title { fill: #102447; font-family: Arial, "PingFang SC", sans-serif; font-size: 30px; font-weight: 700; }
+      .desc { fill: #667085; font-family: Arial, "PingFang SC", sans-serif; font-size: 14px; }
+      .actor { fill: #EEF4FF; stroke: #2F6BFF; stroke-width: 1; }
+      .service { fill: #FFFFFF; stroke: #E5E9F0; stroke-width: 1; }
+      .store { fill: #FFF7E3; stroke: #B7791F; stroke-width: 1; }
+      .llm { fill: #EAF8F1; stroke: #0A8F5B; stroke-width: 1; }
+      .error { fill: #FFF0F1; stroke: #C53D4B; stroke-width: 1; }
+      .head { fill: #102447; font-family: Arial, "PingFang SC", sans-serif; font-size: 13px; font-weight: 700; }
+      .body { fill: #667085; font-family: Arial, "PingFang SC", sans-serif; font-size: 12px; }
+      .note-text { fill: #102447; font-family: Arial, "PingFang SC", sans-serif; font-size: 12px; font-weight: 700; }
+      .lifeline { stroke: #D0D5DD; stroke-width: 1.5; stroke-dasharray: 5 7; }
+      .msg { stroke: #2F6BFF; stroke-width: 2; marker-end: url(#arrowPrimary); }
+      .return { stroke: #98A2B3; stroke-width: 1.5; stroke-dasharray: 6 5; marker-end: url(#arrow); }
+      .fail { stroke: #C53D4B; stroke-width: 2; marker-end: url(#arrowError); }
+      .section { fill: #102447; font-family: Arial, "PingFang SC", sans-serif; font-size: 17px; font-weight: 700; }
+    </style>
+    <marker id="arrowPrimary" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#2F6BFF"/>
+    </marker>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#98A2B3"/>
+    </marker>
+    <marker id="arrowError" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#C53D4B"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1440" height="1120"/>
+  <text class="kicker" x="48" y="50">WISHUB MVP · SEQUENCE</text>
+  <text class="title" x="48" y="94">核心功能（链路）时序图</text>
+  <text class="desc" x="48" y="130">聚焦 MVP 两条 P0 链路：Markdown 上传入库、严格知识库问答。所有答案必须由 READY 文档 chunk 支撑。</text>
+
+  <g transform="translate(48 164)">
+    <rect class="panel" width="1344" height="902" rx="14"/>
+
+    <g transform="translate(24 24)">
+      <g transform="translate(0 0)">
+        <rect class="actor" width="142" height="46" rx="10"/>
+        <text class="head" x="71" y="28" text-anchor="middle">Frontend</text>
+      </g>
+      <g transform="translate(190 0)">
+        <rect class="service" width="142" height="46" rx="10"/>
+        <text class="head" x="71" y="28" text-anchor="middle">FastAPI</text>
+      </g>
+      <g transform="translate(380 0)">
+        <rect class="service" width="142" height="46" rx="10"/>
+        <text class="head" x="71" y="28" text-anchor="middle">Application</text>
+      </g>
+      <g transform="translate(570 0)">
+        <rect class="store" width="142" height="46" rx="10"/>
+        <text class="head" x="71" y="28" text-anchor="middle">SQLite/Storage</text>
+      </g>
+      <g transform="translate(760 0)">
+        <rect class="service" width="142" height="46" rx="10"/>
+        <text class="head" x="71" y="28" text-anchor="middle">Splitter/Embed</text>
+      </g>
+      <g transform="translate(950 0)">
+        <rect class="store" width="142" height="46" rx="10"/>
+        <text class="head" x="71" y="28" text-anchor="middle">ChromaDB</text>
+      </g>
+      <g transform="translate(1140 0)">
+        <rect class="llm" width="142" height="46" rx="10"/>
+        <text class="head" x="71" y="28" text-anchor="middle">LLM</text>
+      </g>
+    </g>
+
+    <line class="lifeline" x1="95" y1="78" x2="95" y2="860"/>
+    <line class="lifeline" x1="285" y1="78" x2="285" y2="860"/>
+    <line class="lifeline" x1="475" y1="78" x2="475" y2="860"/>
+    <line class="lifeline" x1="665" y1="78" x2="665" y2="860"/>
+    <line class="lifeline" x1="855" y1="78" x2="855" y2="860"/>
+    <line class="lifeline" x1="1045" y1="78" x2="1045" y2="860"/>
+    <line class="lifeline" x1="1235" y1="78" x2="1235" y2="860"/>
+
+    <text class="section" x="24" y="112">A. Markdown 上传入库</text>
+    <line class="msg" x1="95" y1="145" x2="285" y2="145"/>
+    <text class="body" x="116" y="137">POST /documents(file)</text>
+    <line class="msg" x1="285" y1="185" x2="475" y2="185"/>
+    <text class="body" x="306" y="177">校验扩展名/大小/非空/同名</text>
+    <line class="msg" x1="475" y1="225" x2="665" y2="225"/>
+    <text class="body" x="496" y="217">保存原文，创建 Document=PROCESSING</text>
+    <line class="return" x1="665" y1="265" x2="285" y2="265"/>
+    <text class="body" x="418" y="257">documentId</text>
+    <line class="return" x1="285" y1="305" x2="95" y2="305"/>
+    <text class="body" x="126" y="297">202 PROCESSING，前端开始轮询</text>
+
+    <line class="msg" x1="475" y1="350" x2="855" y2="350"/>
+    <text class="body" x="548" y="342">后台处理：解析 Markdown、按标题切片、Embedding</text>
+    <line class="msg" x1="855" y1="390" x2="1045" y2="390"/>
+    <text class="body" x="892" y="382">upsert chunks + metadata</text>
+    <line class="return" x1="1045" y1="430" x2="475" y2="430"/>
+    <text class="body" x="694" y="422">索引完成</text>
+    <line class="msg" x1="475" y1="470" x2="665" y2="470"/>
+    <text class="body" x="502" y="462">更新 Document=READY，chunk_count=n</text>
+    <line class="msg" x1="95" y1="510" x2="285" y2="510"/>
+    <text class="body" x="120" y="502">GET /documents/{id}</text>
+    <line class="return" x1="285" y1="550" x2="95" y2="550"/>
+    <text class="body" x="118" y="542">READY 后刷新 summary/list</text>
+
+    <g transform="translate(704 480)">
+      <rect class="error" width="500" height="58" rx="10"/>
+      <text class="note-text" x="18" y="24">失败分支：解析/切片/Embedding/向量写入任一失败</text>
+      <text class="body" x="18" y="44">Document=FAILED，记录 failureCode/failureMessage，不计入目录数，不参与问答。</text>
+    </g>
+
+    <line class="rule" x1="24" y1="596" x2="1320" y2="596"/>
+
+    <text class="section" x="24" y="634">B. 严格知识库问答</text>
+    <line class="msg" x1="95" y1="670" x2="285" y2="670"/>
+    <text class="body" x="126" y="662">POST /qa/ask(question)</text>
+    <line class="msg" x1="285" y1="710" x2="475" y2="710"/>
+    <text class="body" x="306" y="702">校验空问题，进入 Ask 用例</text>
+    <line class="msg" x1="475" y1="750" x2="665" y2="750"/>
+    <text class="body" x="500" y="742">查询 READY 文档数</text>
+    <line class="return" x1="665" y1="790" x2="475" y2="790"/>
+    <text class="body" x="520" y="782">0 或 &gt; 0</text>
+    <line class="msg" x1="475" y1="830" x2="855" y2="830"/>
+    <text class="body" x="548" y="822">问题清晰度检查，Embedding(question)</text>
+    <line class="msg" x1="855" y1="870" x2="1045" y2="870"/>
+    <text class="body" x="894" y="862">检索 READY chunks，按阈值过滤</text>
+    <line class="return" x1="1045" y1="910" x2="475" y2="910"/>
+    <text class="body" x="704" y="902">evidence candidates</text>
+    <line class="msg" x1="475" y1="950" x2="1235" y2="950"/>
+    <text class="body" x="700" y="942">严格 RAG Prompt：只允许使用 evidence</text>
+    <line class="return" x1="1235" y1="990" x2="475" y2="990"/>
+    <text class="body" x="698" y="982">structured answer/refusal/clarification + citations</text>
+    <line class="msg" x1="475" y1="1030" x2="475" y2="1030"/>
+    <text class="body" x="496" y="1024">校验 citations 必须来自本次检索 chunk</text>
+
+    <g transform="translate(24 774)">
+      <rect class="actor" width="250" height="58" rx="10"/>
+      <text class="note-text" x="18" y="24">空库分支</text>
+      <text class="body" x="18" y="44">无 READY 文档：返回 empty_knowledge_base。</text>
+    </g>
+    <g transform="translate(704 662)">
+      <rect class="actor" width="250" height="58" rx="10"/>
+      <text class="note-text" x="18" y="24">澄清分支</text>
+      <text class="body" x="18" y="44">问题缺少对象/场景：返回 clarification。</text>
+    </g>
+    <g transform="translate(704 730)">
+      <rect class="store" width="250" height="58" rx="10"/>
+      <text class="note-text" x="18" y="24">拒答分支</text>
+      <text class="body" x="18" y="44">无命中或证据不足：返回 refusal。</text>
+    </g>
+    <g transform="translate(1018 730)">
+      <rect class="llm" width="270" height="58" rx="10"/>
+      <text class="note-text" x="18" y="24">有依据回答</text>
+      <text class="body" x="18" y="44">返回答案、引用文档名和命中片段。</text>
+    </g>
+  </g>
+</svg>

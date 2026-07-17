@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1040" viewBox="0 0 1440 1040" role="img" aria-labelledby="title desc">
+  <title id="title">wishub MVP 总体架构图</title>
+  <desc id="desc">按前端、接口、应用、领域和基础设施分层展示 wishub MVP 模块及核心职责。</desc>
+  <defs>
+    <style>
+      .bg { fill: #F7F8FA; }
+      .card { fill: #FFFFFF; stroke: #E5E9F0; stroke-width: 1; }
+      .layer-title { fill: #102447; font-family: Arial, "PingFang SC", sans-serif; font-size: 18px; font-weight: 700; }
+      .module-title { fill: #102447; font-family: Arial, "PingFang SC", sans-serif; font-size: 14px; font-weight: 700; }
+      .body { fill: #667085; font-family: Arial, "PingFang SC", sans-serif; font-size: 12px; }
+      .strong { fill: #102447; font-family: Arial, "PingFang SC", sans-serif; font-size: 30px; font-weight: 700; }
+      .kicker { fill: #2F6BFF; font-family: Arial, "PingFang SC", sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0; }
+      .desc { fill: #667085; font-family: Arial, "PingFang SC", sans-serif; font-size: 14px; }
+      .frontend { fill: #EEF4FF; stroke: #2F6BFF; stroke-width: 1; }
+      .interface { fill: #FFFFFF; stroke: #E5E9F0; stroke-width: 1; }
+      .application { fill: #F7F8FA; stroke: #E5E9F0; stroke-width: 1; }
+      .domain { fill: #EAF8F1; stroke: #0A8F5B; stroke-width: 1; }
+      .infra { fill: #FFF7E3; stroke: #B7791F; stroke-width: 1; }
+      .external { fill: #FFF0F1; stroke: #C53D4B; stroke-width: 1; }
+      .arrow { stroke: #98A2B3; stroke-width: 2; marker-end: url(#arrow); }
+      .arrow-primary { stroke: #2F6BFF; stroke-width: 2; marker-end: url(#arrowPrimary); }
+      .rule { stroke: #D0D5DD; stroke-width: 1; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#98A2B3"/>
+    </marker>
+    <marker id="arrowPrimary" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#2F6BFF"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1440" height="1040"/>
+  <text class="kicker" x="48" y="50">WISHUB MVP · ARCHITECTURE</text>
+  <text class="strong" x="48" y="94">总体架构图</text>
+  <text class="desc" x="48" y="130">分层、分模块表达系统边界与职责：接口只做契约，应用只做编排，领域沉淀规则，基础设施适配外部能力。</text>
+
+  <g transform="translate(48 170)">
+    <rect class="card" width="1344" height="820" rx="14"/>
+
+    <g transform="translate(24 24)">
+      <rect class="frontend" width="1296" height="118" rx="12"/>
+      <text class="layer-title" x="20" y="34">Frontend / Presentation</text>
+      <text class="body" x="20" y="58">职责：承载 UED 工作台体验、展示上传/目录/问答状态、轮询处理进度、渲染引用与拒答。</text>
+      <g transform="translate(20 76)">
+        <rect fill="#FFFFFF" stroke="#2F6BFF" width="240" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">KnowledgeBasePage</text>
+      </g>
+      <g transform="translate(282 76)">
+        <rect fill="#FFFFFF" stroke="#2F6BFF" width="190" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">QAPage</text>
+      </g>
+      <g transform="translate(494 76)">
+        <rect fill="#FFFFFF" stroke="#2F6BFF" width="220" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">API Client</text>
+      </g>
+      <text class="body" x="744" y="96">模块要点：文件选择、上传状态、有效目录数、问题输入、AnswerCard、BoundaryState</text>
+    </g>
+
+    <line class="arrow-primary" x1="672" y1="146" x2="672" y2="174"/>
+
+    <g transform="translate(24 174)">
+      <rect class="interface" width="1296" height="118" rx="12"/>
+      <text class="layer-title" x="20" y="34">Interfaces / FastAPI</text>
+      <text class="body" x="20" y="58">职责：HTTP 契约、请求参数校验、multipart 文件接收、DTO 转换、统一错误码和 traceId。</text>
+      <g transform="translate(20 76)">
+        <rect fill="#F7F8FA" stroke="#E5E9F0" width="210" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">DocumentsRouter</text>
+      </g>
+      <g transform="translate(252 76)">
+        <rect fill="#F7F8FA" stroke="#E5E9F0" width="240" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">KnowledgeBaseRouter</text>
+      </g>
+      <g transform="translate(514 76)">
+        <rect fill="#F7F8FA" stroke="#E5E9F0" width="160" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">QARouter</text>
+      </g>
+      <g transform="translate(696 76)">
+        <rect fill="#F7F8FA" stroke="#E5E9F0" width="210" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">Schemas / Errors</text>
+      </g>
+    </g>
+
+    <line class="arrow" x1="672" y1="296" x2="672" y2="324"/>
+
+    <g transform="translate(24 324)">
+      <rect class="application" width="1296" height="136" rx="12"/>
+      <text class="layer-title" x="20" y="34">Application / Use Cases</text>
+      <text class="body" x="20" y="58">职责：编排业务链路、维护状态机、提交后台处理、组合仓储/向量库/LLM，不承载框架和 SDK 细节。</text>
+      <g transform="translate(20 82)">
+        <rect fill="#FFFFFF" stroke="#D0D5DD" width="280" height="34" rx="8"/>
+        <text class="module-title" x="14" y="22">UploadMarkdownDocumentUseCase</text>
+      </g>
+      <g transform="translate(322 82)">
+        <rect fill="#FFFFFF" stroke="#D0D5DD" width="240" height="34" rx="8"/>
+        <text class="module-title" x="14" y="22">ProcessDocumentUseCase</text>
+      </g>
+      <g transform="translate(584 82)">
+        <rect fill="#FFFFFF" stroke="#D0D5DD" width="210" height="34" rx="8"/>
+        <text class="module-title" x="14" y="22">ListDocumentsQuery</text>
+      </g>
+      <g transform="translate(816 82)">
+        <rect fill="#FFFFFF" stroke="#D0D5DD" width="270" height="34" rx="8"/>
+        <text class="module-title" x="14" y="22">AskKnowledgeQuestionUseCase</text>
+      </g>
+    </g>
+
+    <line class="arrow" x1="672" y1="464" x2="672" y2="492"/>
+
+    <g transform="translate(24 492)">
+      <rect class="domain" width="1296" height="136" rx="12"/>
+      <text class="layer-title" x="20" y="34">Domain / Knowledge, Retrieval, QA</text>
+      <text class="body" x="20" y="58">职责：沉淀知识库边界、文档状态规则、引用约束、证据充分性、拒答与澄清策略。</text>
+      <g transform="translate(20 82)">
+        <rect fill="#FFFFFF" stroke="#0A8F5B" width="230" height="34" rx="8"/>
+        <text class="module-title" x="14" y="22">Document / Chunk</text>
+      </g>
+      <g transform="translate(272 82)">
+        <rect fill="#FFFFFF" stroke="#0A8F5B" width="210" height="34" rx="8"/>
+        <text class="module-title" x="14" y="22">Citation / AnswerResult</text>
+      </g>
+      <g transform="translate(504 82)">
+        <rect fill="#FFFFFF" stroke="#0A8F5B" width="250" height="34" rx="8"/>
+        <text class="module-title" x="14" y="22">RetrievalPolicyService</text>
+      </g>
+      <g transform="translate(776 82)">
+        <rect fill="#FFFFFF" stroke="#0A8F5B" width="230" height="34" rx="8"/>
+        <text class="module-title" x="14" y="22">EvidenceGuardService</text>
+      </g>
+      <text class="body" x="1030" y="104">核心规则：仅 READY 文档可问答</text>
+    </g>
+
+    <line class="arrow" x1="672" y1="632" x2="672" y2="660"/>
+
+    <g transform="translate(24 660)">
+      <rect class="infra" width="1296" height="120" rx="12"/>
+      <text class="layer-title" x="20" y="34">Infrastructure / Adapters</text>
+      <text class="body" x="20" y="58">职责：实现领域和应用所需端口，适配本地文件、SQLite、Markdown 解析、ChromaDB、LLM 和 Embedding。</text>
+      <g transform="translate(20 78)">
+        <rect fill="#FFFFFF" stroke="#B7791F" width="230" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">SQLiteRepository</text>
+      </g>
+      <g transform="translate(272 78)">
+        <rect fill="#FFFFFF" stroke="#B7791F" width="200" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">LocalFileStorage</text>
+      </g>
+      <g transform="translate(494 78)">
+        <rect fill="#FFFFFF" stroke="#B7791F" width="210" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">MarkdownSplitter</text>
+      </g>
+      <g transform="translate(726 78)">
+        <rect fill="#FFFFFF" stroke="#B7791F" width="210" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">ChromaVectorStore</text>
+      </g>
+      <g transform="translate(958 78)">
+        <rect fill="#FFFFFF" stroke="#B7791F" width="220" height="28" rx="8"/>
+        <text class="module-title" x="14" y="19">GeneralLLMService</text>
+      </g>
+    </g>
+  </g>
+
+  <g transform="translate(48 1000)">
+    <text class="body" x="0" y="0">依赖方向：Frontend -> Interfaces -> Application -> Domain；Infrastructure 通过端口实现被 Application/Domain 调用。外部事实来源仅限 READY Markdown chunk。</text>
+  </g>
+</svg>
