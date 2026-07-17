@@ -1,0 +1,52 @@
+docs/requirements/mishub_mvp/design/wishub-mvp-ui.pen
+  h_adb319a9dfe55c 3-8611
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e47822800c4e4c8dbb95dced7b421aa3cc60d98c",
+  "prompts": {},
+  "humans": {
+    "h_adb319a9dfe55c": {
+      "author": "yechangqing.1998 <yechangqing.1998@bytedance.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {
+    "s_7e9f2bcbdf0faf": {
+      "tool": "trae",
+      "conversation_id": "6a59047cb3b33c44f8b7fa11",
+      "session_id": "6a59047cb3b33c44f8b7fa11",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_7e9f2bcbdf0faf::t_3418fcfdfacca8": {
+      "tool": "trae",
+      "conversation_id": "6a59047cb3b33c44f8b7fa11",
+      "session_id": "6a59047cb3b33c44f8b7fa11",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_7e9f2bcbdf0faf::t_3cedbd19829ba5": {
+      "tool": "trae",
+      "conversation_id": "6a59047cb3b33c44f8b7fa11",
+      "session_id": "6a59047cb3b33c44f8b7fa11",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_7e9f2bcbdf0faf::t_3f90caa7d4521f": {
+      "tool": "trae",
+      "conversation_id": "6a59047cb3b33c44f8b7fa11",
+      "session_id": "6a59047cb3b33c44f8b7fa11",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_7e9f2bcbdf0faf::t_5abcdd14accf87": {
+      "tool": "trae",
+      "conversation_id": "6a59047cb3b33c44f8b7fa11",
+      "session_id": "6a59047cb3b33c44f8b7fa11",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    }
+  }
+}
