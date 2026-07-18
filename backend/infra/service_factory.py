@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from backend.domain.domainsvc.llm_service import LLMService
 from backend.domain.retrieval.services import TextEmbeddingService, VectorStore
-from backend.infra.llm.embedding_service import HashEmbeddingService, OpenAIEmbeddingService
+from backend.infra.llm.embedding_service import (
+    HashEmbeddingService,
+    OpenAIEmbeddingService,
+    SentenceTransformerEmbeddingService,
+)
 from backend.infra.llm.evidence_bound_llm_service import EvidenceBoundLLMService
 from backend.infra.llm.llm_service_openai import OpenAICompatibleLLMService
 from backend.infra.vectordb.chromadb_embedding_service import ChromaVectorStore
@@ -11,6 +15,13 @@ from backend.shared.config import Settings
 
 def build_embedding_service(settings: Settings) -> TextEmbeddingService:
     provider = settings.embedding_provider.lower()
+    if provider in {"sentence_transformers", "sentence-transformers", "sentence_transformer"}:
+        return SentenceTransformerEmbeddingService(
+            model=settings.embedding_model,
+            device=settings.embedding_device or None,
+            batch_size=settings.embedding_batch_size,
+            query_instruction=settings.embedding_query_instruction or None,
+        )
     if provider == "openai":
         return OpenAIEmbeddingService(
             model=settings.embedding_model,

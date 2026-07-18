@@ -3,6 +3,7 @@ import {
   DocumentStatus,
   KnowledgeBaseSummary,
   KnowledgeDocument,
+  LLMCallLogList,
   QAResult,
   UploadResponse,
 } from "./types";
@@ -41,6 +42,10 @@ export async function askQuestion(question: string): Promise<QAResult> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ question }),
   });
+}
+
+export async function fetchLLMLogs(): Promise<LLMCallLogList> {
+  return request("/api/v1/llm-logs?limit=50&offset=0");
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {

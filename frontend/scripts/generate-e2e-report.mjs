@@ -10,8 +10,8 @@ const repoRoot = path.resolve(frontendDir, "..");
 const reportDir = path.join(repoRoot, "docs", "reports", "e2e");
 const screenshotDir = path.join(reportDir, "screenshots");
 const reportPath = path.join(reportDir, "wishub-mvp-e2e-report.md");
-const frontendUrl = "http://127.0.0.1:5173";
-const backendUrl = "http://127.0.0.1:8000";
+const frontendUrl = "http://127.0.0.1:15173";
+const backendUrl = "http://127.0.0.1:18000";
 const runId = timestamp();
 const backendTmpPrefix = `/tmp/wishub_e2e_report_${runId}`;
 
@@ -26,7 +26,7 @@ async function main() {
     startProcess(
       "backend",
       "uv",
-      ["run", "--package", "backend", "uvicorn", "backend.main:app", "--host", "127.0.0.1", "--port", "8000"],
+      ["run", "--package", "backend", "uvicorn", "backend.main:app", "--host", "127.0.0.1", "--port", "18000"],
       repoRoot,
       {
         WISHUB_SQLITE_PATH: `${backendTmpPrefix}.sqlite3`,
@@ -36,9 +36,13 @@ async function main() {
       },
     ),
   );
-  await waitFor(`${backendUrl}/api/v1/knowledge-base/summary`, 60_000);
+  await waitFor(`${backendUrl}/api/v1/knowledge-base/summary`, 180_000);
 
-  processes.push(startProcess("frontend", "npm", ["run", "dev"], frontendDir));
+  processes.push(
+    startProcess("frontend", "npx", ["vite", "--host", "127.0.0.1", "--port", "15173"], frontendDir, {
+      VITE_API_BASE_URL: backendUrl,
+    }),
+  );
   await waitFor(frontendUrl, 60_000);
 
   const browser = await chromium.launch();
@@ -137,6 +141,20 @@ async function executeCases(page) {
       await questionBox.fill("怎么做");
       await page.getByRole("button", { name: "提交问题" }).click();
       await expectVisible(page.getByText("请补充问题信息"));
+    },
+  });
+
+  await runCase(page, {
+    id: "E2E-007",
+    name: "页面查看大模型调用日志",
+    expected: "完成一次需要大模型生成的问答后，可在调用日志页面查看请求大模型和大模型原始响应数据。",
+    action: async () => {
+      await page.getByRole("button", { name: "调用日志" }).click();
+      await expectVisible(page.getByRole("heading", { name: "调用日志" }));
+      await expectVisible(page.getByRole("heading", { name: "大模型请求与响应日志" }));
+      await expectVisible(page.locator(".log-card-header strong").filter({ hasText: "知识库上传支持什么格式？" }));
+      await expectVisible(page.getByText("请求大模型"));
+      await expectVisible(page.getByText("大模型原始响应"));
     },
   });
 }

@@ -58,6 +58,25 @@ export type QAResult =
       citations?: Citation[];
     };
 
+export type LLMCallLog = {
+  id: string;
+  question: string;
+  modelId: string;
+  status: "SUCCESS" | "FAILED";
+  request: unknown;
+  responseText: string | null;
+  parsedResponse: unknown | null;
+  finalResult: unknown | null;
+  errorMessage: string | null;
+  latencyMs: number;
+  createdAt: string;
+};
+
+export type LLMCallLogList = {
+  total: number;
+  logs: LLMCallLog[];
+};
+
 export class ApiError extends Error {
   code: string;
   status: number;

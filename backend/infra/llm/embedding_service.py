@@ -68,6 +68,68 @@ class OpenAIEmbeddingService(TextEmbeddingService):
         return [list(item.embedding) for item in response.data]
 
 
+class SentenceTransformerEmbeddingService(TextEmbeddingService):
+    """Real local semantic embedding backed by sentence-transformers."""
+
+    def __init__(
+        self,
+        *,
+        model: str,
+        device: Optional[str] = None,
+        batch_size: int = 32,
+        normalize_embeddings: bool = True,
+        query_instruction: Optional[str] = None,
+    ) -> None:
+        if not model:
+            raise ValueError("EMBEDDING_MODEL 必须配置")
+
+        try:
+            from sentence_transformers import SentenceTransformer
+        except ModuleNotFoundError as exc:
+            raise RuntimeError("缺少 sentence-transformers 依赖，无法启用真实 Embedding 服务") from exc
+
+        self._model_name = model
+        self._model = SentenceTransformer(model, device=device)
+        self._batch_size = max(1, batch_size)
+        self._normalize_embeddings = normalize_embeddings
+        self._query_instruction = query_instruction or _default_query_instruction(model)
+
+    def embed_query(self, text: str) -> List[float]:
+        return self._embed([_apply_query_instruction(text, self._query_instruction)])[0]
+
+    def embed_documents(self, texts: Iterable[str]) -> List[List[float]]:
+        text_list = list(texts)
+        if not text_list:
+            return []
+        return self._embed(text_list)
+
+    def _embed(self, texts: List[str]) -> List[List[float]]:
+        embeddings = self._model.encode(
+            texts,
+            batch_size=self._batch_size,
+            normalize_embeddings=self._normalize_embeddings,
+            convert_to_numpy=True,
+            show_progress_bar=False,
+        )
+        return embeddings.astype(float).tolist()
+
+
+def _default_query_instruction(model: str) -> str:
+    normalized = model.lower()
+    if "bge" in normalized and "zh" in normalized:
+        return "为这个句子生成表示以用于检索相关文章："
+    if "bge" in normalized:
+        return "Represent this sentence for searching relevant passages: "
+    return ""
+
+
+def _apply_query_instruction(text: str, instruction: str) -> str:
+    text = text or ""
+    if not instruction:
+        return text
+    return f"{instruction}{text}"
+
+
 def _tokens(text: str) -> set[str]:
     lowered = text.lower()
     result: set[str] = set(re.findall(r"[a-z0-9_]{2,}", lowered))

@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from backend.domain.domainsvc.llm_service import LLMService
 from backend.domain.retrieval.services import TextEmbeddingService, VectorStore
 from backend.infra.persistence.document_repository import DocumentRepository
+from backend.infra.persistence.llm_log_repository import LLMCallLogRepository
 from backend.infra.service_factory import (
     build_embedding_service,
     build_llm_service,
@@ -17,7 +18,7 @@ from backend.infra.service_factory import (
 )
 from backend.infra.spliter.markdown_spliter import MarkdownSplitter
 from backend.infra.storage.local_file_storage import LocalFileStorage
-from backend.interface.api.v1 import documents, knowledge_base, qa
+from backend.interface.api.v1 import documents, knowledge_base, llm_logs, qa
 from backend.shared.config import Settings
 from backend.shared.errors import AppError
 
@@ -41,14 +42,17 @@ def create_app(
 
     app.state.settings = settings
     app.state.repository = DocumentRepository(settings.sqlite_path)
+    app.state.llm_log_repository = LLMCallLogRepository(settings.sqlite_path)
     app.state.storage = LocalFileStorage(settings.upload_dir)
     app.state.splitter = MarkdownSplitter()
     app.state.embedding_service = embedding_service or build_embedding_service(settings)
     app.state.vector_store = vector_store or build_vector_store(settings)
     app.state.llm_service = llm_service or build_llm_service(settings)
+    _reindex_ready_documents(app)
 
     app.include_router(knowledge_base.router)
     app.include_router(documents.router)
+    app.include_router(llm_logs.router)
     app.include_router(qa.router)
 
     @app.exception_handler(AppError)
@@ -79,6 +83,19 @@ def create_app(
         )
 
     return app
+
+
+def _reindex_ready_documents(app: FastAPI) -> None:
+    chunks = app.state.repository.list_ready_chunks()
+    if not chunks:
+        return
+
+    embeddings = app.state.embedding_service.embed_documents([chunk.text for chunk in chunks])
+    app.state.vector_store.upsert_chunks(
+        collection_name=app.state.settings.chroma_collection,
+        chunks=chunks,
+        embeddings=embeddings,
+    )
 
 
 app = create_app()

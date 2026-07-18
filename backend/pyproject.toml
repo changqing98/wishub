@@ -15,5 +15,6 @@ dependencies = [
     "pulsar-client>=3.3.0,<3.6.0",
     "pytest>=8.0.0",
     "python-multipart>=0.0.9",
+    "sentence-transformers>=2.7.0,<3.0.0",
     "uvicorn[standard]>=0.30.0",
 ]

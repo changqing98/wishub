@@ -1,14 +1,15 @@
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
   askQuestion,
+  fetchLLMLogs,
   fetchDocumentStatus,
   fetchDocuments,
   fetchSummary,
   uploadDocument,
 } from "./api";
-import { ApiError, KnowledgeBaseSummary, KnowledgeDocument, QAResult } from "./types";
+import { ApiError, KnowledgeBaseSummary, KnowledgeDocument, LLMCallLog, QAResult } from "./types";
 
-type Page = "knowledge" | "qa";
+type Page = "knowledge" | "qa" | "logs";
 type LoadState = "idle" | "loading" | "ready" | "error";
 type UploadState = "idle" | "selected" | "uploading" | "processing" | "success" | "error";
 
@@ -68,13 +69,21 @@ function App() {
         >
           知识问答
         </button>
+        <button
+          className={page === "logs" ? "nav-item active" : "nav-item"}
+          onClick={() => setPage("logs")}
+        >
+          调用日志
+        </button>
       </aside>
 
       <main className="workspace">
         <header className="topbar">
           <div>
-            <p className="breadcrumb">工作台 / {page === "knowledge" ? "知识库" : "知识问答"}</p>
-            <h1>{page === "knowledge" ? "知识库" : "知识问答"}</h1>
+            <p className="breadcrumb">
+              工作台 / {page === "knowledge" ? "知识库" : page === "qa" ? "知识问答" : "调用日志"}
+            </p>
+            <h1>{page === "knowledge" ? "知识库" : page === "qa" ? "知识问答" : "调用日志"}</h1>
           </div>
           <span className="mode-pill">严格知识库模式</span>
         </header>
@@ -94,8 +103,10 @@ function App() {
             loading={loadState === "loading"}
             onReload={reload}
           />
-        ) : (
+        ) : page === "qa" ? (
           <QAPage summary={summary} onGoKnowledge={() => setPage("knowledge")} />
+        ) : (
+          <LLMLogsPage />
         )}
       </main>
     </div>
@@ -343,6 +354,105 @@ function QAPage({
   );
 }
 
+function LLMLogsPage() {
+  const [logs, setLogs] = useState<LLMCallLog[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const loadLogs = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetchLLMLogs();
+      setLogs(response.logs);
+      setTotal(response.total);
+    } catch (requestError) {
+      setError(readableError(requestError));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadLogs();
+  }, [loadLogs]);
+
+  return (
+    <section className="logs-layout">
+      <div className="panel logs-panel">
+        <div className="section-title">
+          <div>
+            <p className="eyebrow">LLM Observability</p>
+            <h2>大模型请求与响应日志</h2>
+            <p>仅记录实际进入大模型生成链路的问答。目录查询、空库、澄清和检索前拒答不会产生大模型调用。</p>
+          </div>
+          <button className="ghost-button" onClick={() => void loadLogs()}>
+            刷新日志
+          </button>
+        </div>
+
+        {loading ? (
+          <BoundaryCard tone="info" title="正在加载日志" detail="正在读取最近的大模型调用记录。" />
+        ) : error ? (
+          <BoundaryCard tone="error" title="日志加载失败" detail={error} actionLabel="重试" onAction={loadLogs} />
+        ) : logs.length === 0 ? (
+          <BoundaryCard
+            tone="empty"
+            title="暂无大模型调用日志"
+            detail="完成一次需要大模型生成的知识问答后，这里会展示请求 messages 和响应内容。"
+          />
+        ) : (
+          <div className="log-list">
+            <p className="log-total">共 {total} 条，当前展示最近 {logs.length} 条</p>
+            {logs.map((log) => (
+              <article className="log-card" key={log.id}>
+                <div className="log-card-header">
+                  <div>
+                    <strong>{log.question}</strong>
+                    <span>
+                      使用模型：{log.modelId || "unknown"} · {formatDateTime(log.createdAt)} · {log.latencyMs} ms
+                    </span>
+                  </div>
+                  <span className={log.status === "SUCCESS" ? "ready-badge" : "error-badge"}>
+                    {log.status === "SUCCESS" ? "成功" : "失败"}
+                  </span>
+                </div>
+
+                {log.errorMessage ? (
+                  <div className="log-error">错误：{log.errorMessage}</div>
+                ) : null}
+
+                <details open>
+                  <summary>请求大模型</summary>
+                  <JsonBlock value={log.request} />
+                </details>
+                <details open>
+                  <summary>大模型原始响应</summary>
+                  <JsonBlock value={log.responseText || ""} />
+                </details>
+                <details>
+                  <summary>解析响应</summary>
+                  <JsonBlock value={log.parsedResponse} />
+                </details>
+                <details>
+                  <summary>最终返回给页面的数据</summary>
+                  <JsonBlock value={log.finalResult} />
+                </details>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function JsonBlock({ value }: { value: unknown }) {
+  const content = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+  return <pre className="json-block">{content || "null"}</pre>;
+}
+
 function QAResultView({
   result,
   onGoKnowledge,
@@ -467,6 +577,14 @@ function formatBytes(bytes: number) {
     return `${(bytes / 1024).toFixed(1)} KB`;
   }
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function formatDateTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return date.toLocaleString("zh-CN", { hour12: false });
 }
 
 export default App;

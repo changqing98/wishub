@@ -20,4 +20,5 @@ def ask_question(request: Request, payload: AskQuestionRequest) -> dict:
         request.app.state.embedding_service,
         request.app.state.vector_store,
         request.app.state.llm_service,
+        request.app.state.llm_log_repository,
     ).execute(payload.question)

@@ -47,10 +47,18 @@ test("wishub MVP supports Markdown upload, catalog refresh, answer, refusal and 
   await expect(page.getByText("当前有效文档数：1")).toBeVisible();
 
   const questionBox = page.getByPlaceholder("输入一个关于知识库的问题…");
+  await questionBox.fill("哪些文档可以参与问答？");
+  await page.getByRole("button", { name: "提交问题" }).click();
+  await expect(page.getByText("基于知识库的回答")).toBeVisible();
+  await expect(page.getByText(/当前可参与问答的文档/)).toBeVisible();
+  await expect(page.getByText("mvp-fixture.md").first()).toBeVisible();
+
   await questionBox.fill("知识库上传支持什么格式？");
   await page.getByRole("button", { name: "提交问题" }).click();
 
   await expect(page.getByText("基于知识库的回答")).toBeVisible();
+  await expect(page.locator(".answer-card")).toContainText("Markdown");
+  await expect(page.locator(".answer-card")).toContainText(".md");
   await expect(page.getByRole("heading", { name: "引用依据" })).toBeVisible();
   await expect(page.getByText("外部知识：否")).toBeVisible();
   await expect(page.getByText("mvp-fixture.md").first()).toBeVisible();
@@ -62,4 +70,12 @@ test("wishub MVP supports Markdown upload, catalog refresh, answer, refusal and 
   await questionBox.fill("怎么做");
   await page.getByRole("button", { name: "提交问题" }).click();
   await expect(page.getByText("请补充问题信息")).toBeVisible();
+
+  await page.getByRole("button", { name: "调用日志" }).click();
+  await expect(page.getByRole("heading", { name: "调用日志" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "大模型请求与响应日志" })).toBeVisible();
+  await expect(page.locator(".log-card-header strong").filter({ hasText: "知识库上传支持什么格式？" })).toBeVisible();
+  await expect(page.getByText(/使用模型：/)).toBeVisible();
+  await expect(page.getByText("请求大模型")).toBeVisible();
+  await expect(page.getByText("大模型原始响应")).toBeVisible();
 });

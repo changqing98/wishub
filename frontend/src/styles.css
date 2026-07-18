@@ -443,11 +443,103 @@ blockquote p {
   margin-bottom: 0;
 }
 
+.logs-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.logs-panel {
+  min-height: 520px;
+}
+
+.log-list {
+  display: grid;
+  gap: 16px;
+}
+
+.log-total {
+  margin-bottom: 0;
+}
+
+.log-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid #e8edf7;
+  border-radius: 20px;
+  background: #ffffff;
+}
+
+.log-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.log-card-header strong,
+.log-card-header span {
+  display: block;
+}
+
+.log-card-header span {
+  margin-top: 6px;
+  color: #6c7890;
+  font-size: 13px;
+}
+
+.error-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: #fff1f2;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.log-error {
+  border-radius: 14px;
+  padding: 12px;
+  background: #fff1f2;
+  color: #b91c1c;
+}
+
+.log-card details {
+  border: 1px solid #e8edf7;
+  border-radius: 16px;
+  background: #f8fbff;
+  overflow: hidden;
+}
+
+.log-card summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  color: #102447;
+  font-weight: 700;
+}
+
+.json-block {
+  max-height: 360px;
+  overflow: auto;
+  margin: 0;
+  padding: 14px;
+  border-top: 1px solid #e8edf7;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 @media (max-width: 900px) {
   .app-shell,
   .hero-panel,
   .topbar,
-  .document-row {
+  .document-row,
+  .log-card-header {
     display: block;
   }
 
@@ -464,7 +556,8 @@ blockquote p {
   }
 
   .page-grid,
-  .qa-layout {
+  .qa-layout,
+  .logs-layout {
     grid-template-columns: 1fr;
   }
 
