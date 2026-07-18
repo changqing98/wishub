@@ -1,0 +1,14 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "1434ea1726565893379a9aa4fc43f0c77aa2eae5",
+  "prompts": {},
+  "humans": {
+    "h_adb319a9dfe55c": {
+      "author": "yechangqing.1998 <yechangqing.1998@bytedance.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
